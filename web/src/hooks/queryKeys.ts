@@ -24,6 +24,7 @@ export const qk = {
   },
   trips: {
     all: ['trips'] as const,
+    lists: ['trips', 'list'] as const,
     list: (filters: TripsFilters) => ['trips', 'list', filters] as const,
     detail: (id: string) => ['trips', 'detail', id] as const,
   },

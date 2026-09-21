@@ -28,11 +28,14 @@ export function useTrip(tripId: string | undefined) {
 
 // Trips feed the rankings (70 points per attendee), so every mutation has to
 // invalidate them alongside the trip list.
+// refetchType 'all' is required because the global client sets refetchOnMount
+// to false: mutating from the detail page leaves the list query inactive, and
+// an inactive query marked stale would never refetch when the grid remounts.
 function useTripInvalidation() {
   const queryClient = useQueryClient()
   return () => {
-    void queryClient.invalidateQueries({ queryKey: qk.trips.all })
-    void queryClient.invalidateQueries({ queryKey: qk.rankings })
+    void queryClient.invalidateQueries({ queryKey: qk.trips.all, refetchType: 'all' })
+    void queryClient.invalidateQueries({ queryKey: qk.rankings, refetchType: 'all' })
   }
 }
 
@@ -54,9 +57,18 @@ export function useUpdateTrip() {
 }
 
 export function useDeleteTrip() {
+  const queryClient = useQueryClient()
   const invalidate = useTripInvalidation()
   return useMutation({
     mutationFn: (tripId: string) => api.delete(`/api/trips/${tripId}`),
-    onSuccess: invalidate,
+    onSuccess: (_data, tripId) => {
+      // Drop the trip from the cached lists right away so the grid never shows
+      // the deleted card while the background refetch is still in flight.
+      queryClient.setQueriesData<Trip[]>({ queryKey: qk.trips.lists }, (current) =>
+        current?.filter((trip) => trip.id !== tripId),
+      )
+      queryClient.removeQueries({ queryKey: qk.trips.detail(tripId) })
+      invalidate()
+    },
   })
 }
