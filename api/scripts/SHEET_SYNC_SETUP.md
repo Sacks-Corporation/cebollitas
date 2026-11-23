@@ -40,10 +40,10 @@ Other variables:
 
 ## 3. Test locally before scheduling
 
-From the `api/` directory, with the venv active:
+From the `api/` directory, with a Python venv active (see `scripts/.python-version`):
 
 ```sh
-pip install -r requirements.txt
+pip install -r scripts/requirements.txt
 SYNC_DRY_RUN=true python scripts/sync_sheet_matches.py
 ```
 

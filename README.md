@@ -1,11 +1,11 @@
 # Cebollitas Oficial
 
-Private monorepo for a yearly friend-group scoring app. The frontend lives in `web` (React + TypeScript + Tailwind) and the backend lives in `api` (FastAPI + JSON persistence).
+Private monorepo for a yearly friend-group scoring app. The frontend lives in `web` (React + TypeScript + Tailwind) and the backend lives in `api` (NestJS + MongoDB or JSON persistence).
 
 ## Repository structure
 
 - `web/`: React app
-- `api/`: FastAPI app
+- `api/`: NestJS app (`src/`), seed data (`data/`) and offline Python scripts (`scripts/`)
 
 ## Frontend setup
 
@@ -21,17 +21,21 @@ The app runs on `http://localhost:5173`.
 
 ```bash
 cd api
-pip install -r requirements.txt
+npm install
 cp .env.example .env
-uvicorn main:app --reload
+npm run start:dev
 ```
+
+The Python scripts in `api/scripts` (Excel loaders, Google Sheet sync,
+migrations) have their own dependencies: `pip install -r scripts/requirements.txt`
+and run them from `api/` (e.g. `python scripts/sync_allowed_users.py`).
 
 The API runs on `http://localhost:8000`.
 
 ## Generate vote encryption key
 
 ```bash
-python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+node -e "console.log(require('crypto').randomBytes(32).toString('base64url') + '=')"
 ```
 
 Set the value in `VOTE_ENCRYPTION_KEY`.

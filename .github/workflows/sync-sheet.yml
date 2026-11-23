@@ -21,11 +21,12 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version-file: api/.python-version
+          python-version-file: api/scripts/.python-version
 
+      # The API is NestJS; only the offline scripts in api/scripts are Python.
       - name: Install dependencies
         working-directory: api
-        run: pip install -r requirements.txt
+        run: pip install -r scripts/requirements.txt
 
       - name: Run sync
         working-directory: api
